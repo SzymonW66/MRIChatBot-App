@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brain Tumor Classification</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        background-color: #f2e9e4;
+        height: auto;
+        width: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-family: Ubuntu;
+        font-size: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      nav {
+        background-color: #4a4e69;
+        height: 12vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0px 0px 5px #2f2f2f;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 999;
+      }
+      nav img {
+        height: 120%;
+        padding-top: 10px;
+        filter: drop-shadow(0px 0px 2px #f2e9e4);
+      }
+      .mt-5 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 25px;
+        width: 100%;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 80%;
+      }
+      .mb-3 {
+        width: 100%;
+        text-align: center;
+      }
+      .btn-primary {
+        background-color: #9a8c98;
+        border: 2px solid #9a8c98;
+        padding: 15px 30px;
+        transition: 0.4s all;
+        box-shadow: 0px 0px 5px #2f2f2f;
+      }
+      .btn-primary:hover {
+        background-color: #9a8c981c;
+        border: 2px solid #9a8c981c;
+        color: #2f2f2f;
+      }
+      .file-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 20px;
+        padding-bottom: 150px;
+      }
+      h5 p {
+        font-size: 1rem;
+      }
+      .file-card {
+        background-color: #4a4e69;
+        padding: 15px;
+        border-radius: 10px;
+        width: 200px;
+        text-align: center;
+        color: #e5e5e5;
+        box-shadow: 0px 0px 5px #2f2f2f;
+      }
+      .file-card img {
+        max-width: 100%;
+        border-radius: 8px;
+      }
+      .file-card h5 {
+        margin-top: 10px;
+      }
+      /*footer {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        background-color: #4a4e69;
+        border-top: 2px solid white;
+        padding-left: 20px;
+        padding-right: 20px;
+        color: #e5e5e5;
+      }
+      h4 {
+        font-size: 16px !important;
+        margin: 0px !important;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }*/
+      h1 {
+        margin-top: 150px;
+      }
+      .openchatbot {
+        position: fixed;
+        bottom: 5%;
+        right: 5%;
+        background-color: #fff;
+        height: 80px;
+        width: 80px;
+        border-radius: 50%;
+        border: 5px solid #4a4e69;
+        box-shadow: 0px 0px 5px #2f2f2f;
+      }
+      .openchatbot::before {
+        position: absolute;
+        top: 5%;
+        left: -250%;
+        content: "Talk to the chatbot";
+        width: 250px;
+        background-color: #fff;
+        padding: 15px 20px;
+        border-radius: 50px;
+        border: 5px solid #4a4e69;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out, left 0.4s ease-in-out;
+      }
+      .openchatbot:hover::before {
+        opacity: 1;
+        left: -380%;
+        box-shadow: 0px 0px 5px #2f2f2f;
+      }
+      svg {
+        height: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <img alt="logo" src="static/images/logo.png" />
+    </nav>
+
+    <h1 class="text-center">Brain Tumor Classification</h1>
+    <form action="/" method="POST" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="file" class="form-label">Upload a brain image</label>
+        <input
+          type="file"
+          class="form-control"
+          id="file"
+          name="file"
+          required
+        />
+      </div>
+      <button type="submit" class="btn btn-primary">SUBMIT</button>
+    </form>
+
+    <div class="file-container">
+      {% for filename in uploaded_files %}
+      <div class="file-card">
+        <img
+          src="{{ url_for('uploaded_file', filename=filename) }}"
+          alt="Image preview"
+        />
+        <h5>
+          Model 1:
+          <p>
+            {{ predictions.get(filename, {}).get('model1', 'No prediction yet')
+            }}
+          </p>
+        </h5>
+      </div>
+      {% endfor %}
+    </div>
+
+    <button id="openChatbot" class="openchatbot">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+        <g
+          id="SVGRepo_tracerCarrier"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        ></g>
+        <g id="SVGRepo_iconCarrier">
+          <path
+            d="M8 10.5H16"
+            stroke="#4a4e69"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          ></path>
+          <path
+            d="M8 14H13.5"
+            stroke="#4a4e69"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          ></path>
+          <path
+            d="M17 3.33782C15.5291 2.48697 13.8214 2 12 2C6.47715 2 2 6.47715 2 12C2 13.5997 2.37562 15.1116 3.04346 16.4525C3.22094 16.8088 3.28001 17.2161 3.17712 17.6006L2.58151 19.8267C2.32295 20.793 3.20701 21.677 4.17335 21.4185L6.39939 20.8229C6.78393 20.72 7.19121 20.7791 7.54753 20.9565C8.88837 21.6244 10.4003 22 12 22C17.5228 22 22 17.5228 22 12C22 10.1786 21.513 8.47087 20.6622 7"
+            stroke="#4a4e69"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          ></path>
+        </g>
+      </svg>
+    </button>
+
+    <script src="{{ url_for('static', filename='/js/chatbot.js') }}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- <footer>
+      <h4>Szymon Wajs</h4>
+      <h4>Mateusz Langaj</h4>
+      <h4>Maciej Górny</h4>
+    </footer> -->
+  </body>
+</html>

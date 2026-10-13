@@ -1,0 +1,28 @@
+# Python environments and generated files
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+
+# Uploaded medical images and generated predictions
+uploads/
+predictions*.json
+
+# Local app data, logs, editors, and operating-system files
+instance/
+logs/
+*.log
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
