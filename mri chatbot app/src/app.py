@@ -1,18 +1,25 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, jsonify, session
 import os
+from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 import tensorflow as tf
 from PIL import Image
 import numpy as np
 import json
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+
+load_dotenv(os.path.join(PROJECT_ROOT, '.env'))
+
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'
-app.config['UPLOAD_FOLDER'] = 'uploads'
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'your_secret_key_here')
+app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'uploads')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limit 16MB
 
 # Load the model
-brain_tumor_model = tf.keras.models.load_model('model1/effnet.keras')
+model_path = os.path.join(BASE_DIR, 'models', 'effnet.keras')
+brain_tumor_model = tf.keras.models.load_model(model_path)
 
 # Labels
 tumor_labels = ['Glioma Tumor', 'No Tumor', 'Meningioma Tumor', 'Pituitary Tumor']
@@ -26,7 +33,7 @@ def preprocess_image(image_path):
 
 # Save predictions to a file
 def save_prediction(filename, prediction, model_id):
-    predictions_file = f'predictions{model_id}.json'
+    predictions_file = os.path.join(BASE_DIR, f'predictions{model_id}.json')
     if os.path.exists(predictions_file):
         with open(predictions_file, 'r') as f:
             predictions = json.load(f)
@@ -86,8 +93,9 @@ def index():
 
     # Load predictions for the model
     model_predictions = {}
-    if os.path.exists('predictions1.json'):
-        with open('predictions1.json', 'r') as f:
+    predictions_file = os.path.join(BASE_DIR, 'predictions1.json')
+    if os.path.exists(predictions_file):
+        with open(predictions_file, 'r') as f:
             model_predictions = json.load(f)
 
     # Combine predictions into one dictionary
@@ -104,7 +112,7 @@ from flask import send_from_directory
 
 @app.route('/chatbot/<path:filename>')
 def serve_chatbot_files(filename):
-    return send_from_directory('chatbot', filename)
+    return send_from_directory(os.path.join(BASE_DIR, 'chatbot'), filename)
 
 # API for chatbot requests
 @app.route('/chat', methods=['POST'])
